@@ -184,24 +184,24 @@ abstract class BaseAbstractGateway extends AbstractGateway
         return $this->setParameter('timestamp', $value);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBizContent()
-    {
-        return $this->getParameter('biz_content');
-    }
-
-
-    /**
-     * @param $value
-     *
-     * @return $this
-     */
-    public function setBizContent($value)
-    {
-        return $this->setParameter('biz_content', $value);
-    }
+    // /**
+    //  * @return mixed
+    //  */
+    // public function getBizContent()
+    // {
+    //     return $this->getParameter('biz_content');
+    // }
+    //
+    //
+    // /**
+    //  * @param $value
+    //  *
+    //  * @return $this
+    //  */
+    // public function setBizContent($value)
+    // {
+    //     return $this->setParameter('biz_content', $value);
+    // }
 
     /**
      * @return mixed
