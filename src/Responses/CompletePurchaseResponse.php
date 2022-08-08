@@ -17,15 +17,15 @@ class CompletePurchaseResponse extends BaseAbstractResponse
 
     public function isPaid()
     {
-        // $data = $this->getBizContent();
+        $data = $this->getData();
 
-        'trade_state' == 'SUCCESS';
+        return $data && $data['trade_state'] == 'SUCCESS';
     }
 
-    public function getBizContent()
+    public function getOutTradeNo()
     {
         $data = $this->getData();
 
-        return $data['biz_content'];
+        return $data['out_trade_no'];
     }
 }

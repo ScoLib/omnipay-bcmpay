@@ -16,7 +16,7 @@ class RefundRequest extends BaseAbstractRequest
     protected $reqBodyKeys = [
         'refund_amount',
         'mcht_id',
-        'notify_url',
+        // 'notify_url',
         'mcht_order_no',
     ];
 

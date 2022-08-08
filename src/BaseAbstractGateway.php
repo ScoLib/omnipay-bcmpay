@@ -5,6 +5,7 @@ namespace Omnipay\BCMPay;
 use Omnipay\BCMPay\Requests\PreOrderRequest;
 use Omnipay\BCMPay\Requests\CompletePurchaseRequest;
 use Omnipay\BCMPay\Requests\QueryOrderRequest;
+use Omnipay\BCMPay\Requests\RefundRequest;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Common\Exception\InvalidRequestException;
 use Omnipay\Common\Message\AbstractRequest;
@@ -315,10 +316,10 @@ abstract class BaseAbstractGateway extends AbstractGateway
     /**
      * @param array $parameters
      *
-     * @return \Omnipay\WechatPay\Message\RefundOrderRequest
+     * @return \Omnipay\BCMPay\Requests\RefundRequest
      */
     public function refund($parameters = array())
     {
-        return $this->createRequest('\Omnipay\WechatPay\Message\RefundOrderRequest', $parameters);
+        return $this->createRequest(RefundRequest::class, $parameters);
     }
 }

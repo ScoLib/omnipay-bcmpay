@@ -46,17 +46,38 @@ class CompletePurchaseRequest extends BaseAbstractRequest
 
     public function sendData($data)
     {
-        $sign = $data['sign'];
 
-        $signer = new Signer($data);
-        $signer->setIgnores(['sign']);
-        $content = $signer->getContentToSign();
-        $match = $signer->verifyWithRSA($content, $sign, $this->getBcmPublicKey(), OPENSSL_ALGO_SHA256);
+        $arr = explode(',"sign":"', $data);
+
+        $content = substr($arr[0], 1);
+
+        $sign = substr($arr[1],0, -2);
+
+        $match = (new Signer())->verifyWithRSA($content, $sign, $this->getBcmPublicKey(), OPENSSL_ALGO_SHA256);
 
         if (! $match) {
             throw new InvalidRequestException('The signature is not match');
         }
 
+        $data = json_decode($data, true);
+
+        $data = $data['encrypt_key'] ? $this->decryptBizContent($data) : $data['biz_content'];
+
         return $this->response = new CompletePurchaseResponse($this, $data);
+    }
+
+    protected function decryptBizContent(array $data)
+    {
+        $privateKey = (new Signer())->format($this->getPrivateKey(), Signer::KEY_TYPE_PRIVATE);
+
+        $res = openssl_pkey_get_private($privateKey);
+
+        // 解密 encrypt_key
+        openssl_private_decrypt(base64_decode($data['encrypt_key']), $key, $res);
+
+        // 解密 biz_content
+        $decrypted = openssl_decrypt(base64_decode($data['biz_content']), 'AES-256-CBC', base64_decode($key), OPENSSL_RAW_DATA);
+
+        return json_decode($decrypted, true);
     }
 }
