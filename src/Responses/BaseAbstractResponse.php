@@ -7,5 +7,13 @@ use Omnipay\Common\Message\AbstractResponse;
 
 abstract class BaseAbstractResponse extends AbstractResponse
 {
+    /**
+     * @inheritDoc
+     */
+    public function isSuccessful()
+    {
+        $data = $this->getData();
 
+        return $data && $data['biz_state'] === 'S' && $data['rsp_code'] === '0000';
+    }
 }

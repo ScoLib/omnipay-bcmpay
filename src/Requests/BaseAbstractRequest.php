@@ -6,7 +6,6 @@ namespace Omnipay\BCMPay\Requests;
 use Omnipay\BCMPay\Common\Helper;
 use Omnipay\BCMPay\Common\Signer;
 use Omnipay\Common\Exception\InvalidRequestException;
-use Omnipay\Common\Http\Exception\NetworkException;
 use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -40,18 +39,9 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         $this->setDefaults();
 
-        // $this->validateParams();
-        $this->validate(
-            'app_id',
-            'msg_id',
-            'fmt_type',
-            'timestamp'
-        );
-
+        $this->validateParams();
         $this->validateReqHead();
         $this->validateReqBody();
-
-        // $this->convertToString();
 
         $data = $this->parameters->all();
 
@@ -79,10 +69,9 @@ abstract class BaseAbstractRequest extends AbstractRequest
         );
     }
 
-
     protected function setDefaults()
     {
-        if (! $this->getTimestamp()) {
+        if (!$this->getTimestamp()) {
             $this->setTimestamp(date('Y-m-d H:i:s'));
         }
 
@@ -92,7 +81,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
                 'trace_no' => $this->generateTraceNo(),
             ]);
         }
-
     }
 
     protected function generateTraceNo()
@@ -103,21 +91,11 @@ abstract class BaseAbstractRequest extends AbstractRequest
     }
 
 
-    protected function convertToString()
-    {
-        foreach ($this->parameters->all() as $key => $value) {
-            if (is_array($value) || is_object($value)) {
-                $this->parameters->set($key, json_encode($value, true));
-            }
-        }
-    }
-
-
     /**
      * @param mixed $data
      *
      * @return mixed|ResponseInterface|StreamInterface
-     * @throws NetworkException
+     * @throws \Omnipay\Common\Http\Exception\NetworkException|\Omnipay\Common\Exception\InvalidRequestException
      */
     public function sendData($data)
     {
@@ -131,11 +109,12 @@ abstract class BaseAbstractRequest extends AbstractRequest
 
         $response = $this->httpClient->request($method, $url, $headers, $body);
 
+        $this->verifySignature((string) $response->getBody());
+
         $payload = $this->decode($response->getBody());
 
-        return $payload;
+        return $payload['rsp_biz_content'];
     }
-
 
     /**
      * @return string
@@ -144,7 +123,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         return 'POST';
     }
-
 
     /**
      * @return string
@@ -171,6 +149,20 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return json_decode($data, true);
     }
 
+    protected function verifySignature($body)
+    {
+        $arr = explode(',"sign":"', $body);
+
+        $content = substr($arr[0], strlen('{"rsp_biz_content":'));
+
+        $sign = substr($arr[1],0, -2);
+
+        $match = (new Signer())->verifyWithRSA($content, $sign, $this->getBcmPublicKey(), OPENSSL_ALGO_SHA256);
+
+        if (! $match) {
+            throw new InvalidRequestException('The signature is not match');
+        }
+    }
 
     /**
      * @return mixed
@@ -189,7 +181,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         return $this->setParameter('timestamp', $value);
     }
-
 
     /**
      * @param $params
@@ -216,7 +207,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return $this->privateKey;
     }
 
-
     /**
      * @param $value
      *
@@ -236,7 +226,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         return $this->bcmPublicKey;
     }
-
 
     /**
      * @param $value
@@ -258,7 +247,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return $this->endpoint;
     }
 
-
     /**
      * @param $value
      *
@@ -271,32 +259,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return $this;
     }
 
-
-
-
-
-    /**
-     * @param null $key
-     * @param null $default
-     *
-     * @return mixed
-     */
-    public function getBizData($key = null, $default = null)
-    {
-        if (is_string($this->getBizContent())) {
-            $data = json_decode($this->getBizContent(), true);
-        } else {
-            $data = $this->getBizContent();
-        }
-
-        if (is_null($key)) {
-            return $data;
-        } else {
-            return array_get($data, $key, $default);
-        }
-    }
-
-
     /**
      * @return mixed
      */
@@ -304,7 +266,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         return $this->getParameter('app_id');
     }
-
 
     /**
      * @param $value
@@ -324,7 +285,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return $this->getParameter('msg_id');
     }
 
-
     /**
      * @param $value
      *
@@ -335,7 +295,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
         return $this->setParameter('msg_id', $value);
     }
 
-
     /**
      * @return mixed
      */
@@ -343,7 +302,6 @@ abstract class BaseAbstractRequest extends AbstractRequest
     {
         return $this->getParameter('fmt_type');
     }
-
 
     /**
      * @param $value
@@ -449,6 +407,31 @@ abstract class BaseAbstractRequest extends AbstractRequest
             if (! array_has($data, $key)) {
                 throw new InvalidRequestException("The biz_content.req_body $key parameter is required");
             }
+        }
+    }
+
+    /**
+     * @throws InvalidRequestException
+     */
+    public function validateReqBodyOne()
+    {
+        $data = $this->getReqBody();
+
+        $keys = func_get_args();
+
+        $allEmpty = true;
+
+        foreach ($keys as $key) {
+            if (array_has($data, $key)) {
+                $allEmpty = false;
+                break;
+            }
+        }
+
+        if ($allEmpty) {
+            throw new InvalidRequestException(
+                sprintf('The req_body (%s) parameter must provide one at least', implode(',', $keys))
+            );
         }
     }
 

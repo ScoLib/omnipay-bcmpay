@@ -2,7 +2,7 @@
 
 namespace Omnipay\BCMPay;
 
-use Omnipay\BCMPay\Requests\CreateOrderRequest;
+use Omnipay\BCMPay\Requests\PreOrderRequest;
 use Omnipay\BCMPay\Requests\CompletePurchaseRequest;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Common\Exception\InvalidRequestException;
@@ -271,19 +271,16 @@ abstract class BaseAbstractGateway extends AbstractGateway
 
     /**
      * @param array $parameters
-     * @return \Omnipay\BCMPay\Requests\CreateOrderRequest
+     * @return \Omnipay\BCMPay\Requests\PreOrderRequest
      */
     public function purchase($parameters = array())
     {
-        return $this->createRequest(CreateOrderRequest::class, $parameters);
+        return $this->createRequest(PreOrderRequest::class, $parameters);
     }
 
     /**
-     *
      * @param array $parameters
-     *
-     * @return CompletePurchaseRequest|AbstractRequest
-     * @throws InvalidRequestException
+     * @return \Omnipay\BCMPay\Requests\CompletePurchaseRequest
      */
     public function completePurchase(array $parameters = [])
     {
