@@ -19,6 +19,11 @@ class PreOrderResponse extends BaseAbstractResponse
     {
         $data = $this->getData();
 
-        return $data && $data['rsp_body']['redirectUrl'];
+        if ($data && !empty($data['rsp_body']['redirect_url'])) {
+            return $data['rsp_body']['redirect_url'];
+        }
+
+
+        return '';
     }
 }

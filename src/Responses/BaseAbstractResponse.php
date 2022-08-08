@@ -14,6 +14,6 @@ abstract class BaseAbstractResponse extends AbstractResponse
     {
         $data = $this->getData();
 
-        return $data && $data['biz_state'] === 'S' && $data['rsp_code'] === '0000';
+        return $data && $data['biz_state'] === 'S';
     }
 }
