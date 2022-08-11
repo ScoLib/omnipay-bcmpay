@@ -301,18 +301,6 @@ abstract class BaseAbstractGateway extends AbstractGateway
         return $this->createRequest(QueryOrderRequest::class, $parameters);
     }
 
-
-    /**
-     * @param array $parameters
-     *
-     * @return \Omnipay\WechatPay\Message\CloseOrderRequest
-     */
-    public function close($parameters = array())
-    {
-        return $this->createRequest('\Omnipay\WechatPay\Message\CloseOrderRequest', $parameters);
-    }
-
-
     /**
      * @param array $parameters
      *
