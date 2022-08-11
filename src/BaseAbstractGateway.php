@@ -288,8 +288,7 @@ abstract class BaseAbstractGateway extends AbstractGateway
     {
         return $this->createRequest(CompletePurchaseRequest::class, $parameters);
     }
-
-
+    
     /**
      *
      * @param array $parameters
