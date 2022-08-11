@@ -6,13 +6,22 @@ namespace Omnipay\BCMPay\Responses;
 
 class CompletePurchaseResponse extends BaseAbstractResponse
 {
-
     /**
      * @inheritDoc
      */
     public function isSuccessful()
     {
         return $this->isPaid();
+    }
+
+    public function getRepHead($key = null)
+    {
+        return null;
+    }
+
+    public function getRepBody($key = null)
+    {
+        return null;
     }
 
     public function isPaid()

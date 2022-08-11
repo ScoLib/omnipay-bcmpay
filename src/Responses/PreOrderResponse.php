@@ -10,20 +10,11 @@ class PreOrderResponse extends BaseAbstractResponse
      */
     protected $request;
 
-
-
     /**
      * Gets the redirect target url.
      */
     public function getRedirectUrl()
     {
-        $data = $this->getData();
-
-        if ($data && !empty($data['rsp_body']['redirect_url'])) {
-            return $data['rsp_body']['redirect_url'];
-        }
-
-
-        return '';
+        return $this->getRepBody('redirect_url') ?? '';
     }
 }

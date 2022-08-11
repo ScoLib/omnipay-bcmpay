@@ -16,4 +16,22 @@ abstract class BaseAbstractResponse extends AbstractResponse
 
         return $data && $data['biz_state'] === 'S';
     }
+
+    public function getRepHead($key = null)
+    {
+        if (is_null($key)) {
+            return array_get($this->data, "rsp_head");
+        } else {
+            return array_get($this->data, "rsp_head.{$key}");
+        }
+    }
+
+    public function getRepBody($key = null)
+    {
+        if (is_null($key)) {
+            return array_get($this->data, "rsp_body");
+        } else {
+            return array_get($this->data, "rsp_body.{$key}");
+        }
+    }
 }
