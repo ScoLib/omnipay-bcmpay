@@ -2,13 +2,13 @@
 
 namespace Omnipay\BCMPay\Requests;
 
-use Omnipay\BCMPay\Responses\RefundResponse;
+use Omnipay\BCMPay\Responses\RefundOrderResponse;
 
 /**
  * 申请退款
  *
  */
-class RefundRequest extends BaseAbstractRequest
+class RefundOrderRequest extends BaseAbstractRequest
 {
 
     protected $path = '/api/walletpay/misRefund/v1';
@@ -29,13 +29,13 @@ class RefundRequest extends BaseAbstractRequest
 
     /**
      * @param mixed $data
-     * @return mixed|\Omnipay\BCMPay\Responses\RefundResponse
+     * @return mixed|\Omnipay\BCMPay\Responses\RefundOrderResponse
      * @throws \Omnipay\Common\Exception\InvalidRequestException
      */
     public function sendData($data)
     {
         $payload  = parent::sendData($data);
 
-        return $this->response = new RefundResponse($this, $payload);
+        return $this->response = new RefundOrderResponse($this, $payload);
     }
 }
